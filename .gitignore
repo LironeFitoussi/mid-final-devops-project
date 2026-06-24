@@ -1,0 +1,21 @@
+# Node
+node_modules/
+npm-debug.log*
+.npm
+.env
+
+# Terraform (created in Layer 1)
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+override.tf
+override.tf.json
+.terraform.lock.hcl
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

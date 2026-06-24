@@ -15,13 +15,15 @@ way to an automated **deployment** in the cloud.
 
 ## How to use this repo
 
-This repository currently contains the **lab workbook** (`docs/`). Each layer of
-the project has its own document with a goal, ordered tasks, an acceptance
-checklist, common pitfalls, and verification commands. Work through them in
-order — the numbering matches the build order.
+This repository contains the **lab workbook** (`docs/`) and the **sample
+application** (`app/`). Each layer of the project has its own document with a
+goal, ordered tasks, an acceptance checklist, common pitfalls, and verification
+commands. Work through them in order — the numbering matches the build order.
 
-The code directories (`terraform/`, `helm/`, `app/`, `.github/workflows/`) are
-**not** created yet; you build them as you complete each layer.
+The provided app (`app/`) is **MemeForge**, a self-contained CMS-style web app —
+see [`app/README.md`](app/README.md). The remaining directories (`terraform/`,
+`helm/`, `.github/workflows/`) are **not** created yet; you build them as you
+complete each layer.
 
 ## Documentation index
 
