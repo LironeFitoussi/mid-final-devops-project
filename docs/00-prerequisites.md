@@ -33,7 +33,15 @@ These are the most common failure points. Ignoring them will get you stuck at
 
 6. **Pulling images from ECR needs no pull secret.** *(informational; Layers 4–6)*
    The node IAM role handles it automatically. This is why the real deployment
-   pulls from ECR rather than Docker Hub.
+   pulls from ECR rather than Docker Hub. (The in-cluster MongoDB pulls the public
+   `mongo:7` image from Docker Hub, which also needs no secret.)
+
+7. **Persistent storage for the in-cluster MongoDB.** *(blocks Layer 3)*
+   The app's MongoDB runs in the cluster and needs a PersistentVolume. EKS
+   requires the **EBS CSI driver** addon (with an IAM role via IRSA) **and a
+   default StorageClass** (e.g. `gp3`) for dynamic provisioning. Without it the
+   MongoDB PVC stays `Pending`, the database never starts, and the app can't
+   connect (`/readyz` stays `503`). Set this up in [Layer 1](01-infrastructure.md).
 
 ---
 

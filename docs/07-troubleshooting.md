@@ -15,6 +15,8 @@ for fairness). You must identify it, explain the root cause, and fix it.
 | `limits` too low | `OOMKilled` |
 | Readiness probe on wrong path | pod never reaches `Ready` |
 | Selector not matching labels | Service has no endpoints |
+| Wrong `MONGODB_URI` / Mongo Service name | app runs but `/readyz` → `503`, logs show DB connection errors |
+| MongoDB PVC unbound | mongo pod stuck `Pending`, app can't connect |
 
 ## Acceptance Criteria
 - [ ] Identify the fault (`kubectl describe` / `logs` / `get events`)
@@ -28,6 +30,8 @@ kubectl describe pod <pod> -n <ns>          # events: pull errors, OOMKilled, pr
 kubectl logs <pod> -n <ns>                  # app-level errors
 kubectl get events -n <ns> --sort-by=.lastTimestamp
 kubectl get endpoints <svc> -n <ns>         # empty? selector/label mismatch
+kubectl get pvc -n <ns>                     # Pending? Mongo storage not provisioned
+curl -s http://<EXTERNAL-IP>:8080/readyz    # 503? app can't reach MongoDB
 ```
 
 ### Symptom → likely cause
@@ -37,6 +41,10 @@ kubectl get endpoints <svc> -n <ns>         # empty? selector/label mismatch
   `/healthz:8080`).
 - Service reachable but 503 / no endpoints → Service `selector` doesn't match pod
   labels (align them).
+- App `Running` but `/readyz` 503 → wrong `MONGODB_URI` / Mongo Service name, or
+  MongoDB not running (check the mongo pod, its Service, and the Secret).
+- Mongo pod stuck `Pending` → PVC unbound: no EBS CSI driver or default
+  StorageClass ([Layer 1](01-infrastructure.md) / [Prereq #7](00-prerequisites.md)).
 
 ## Verification
 ```bash

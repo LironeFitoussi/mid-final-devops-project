@@ -36,7 +36,14 @@ serving traffic. (Required documentation deliverable.)
    secret needed — [Prereq #6](00-prerequisites.md)).
 
 9. **Serving** — the `LoadBalancer` Service routes external traffic to the new,
-   ready pods on port `8080`.
+   ready pods on port `8080`. Each app pod connects to **MongoDB** over the
+   in-cluster `ClusterIP` Service using `MONGODB_URI` (from a Secret); `/readyz`
+   returns `200` once that connection is up.
+
+10. **MongoDB is deployed once, not per release.** The same Helm release includes
+    the MongoDB Deployment + PVC. The CI rebuilds and rolls out **only the app**;
+    MongoDB keeps running and its data persists on the EBS-backed PVC across app
+    rollouts (see [Layer 3](03-kubernetes-helm.md)).
 
 ## Why the rollout actually happens
 

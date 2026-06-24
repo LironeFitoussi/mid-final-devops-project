@@ -16,7 +16,9 @@ documentation deliverable.)
 | EKS Control Plane | Layer 1 | **Fixed hourly charge** |
 | Managed Node Group (`t3.medium` ×2) | Layer 1 | **EC2 hourly** |
 | ECR Repository | Layer 1 | Storage per GB + data transfer |
+| EBS CSI driver addon | Layer 1 | Free (the volumes it provisions are not) |
 | **LoadBalancer (ELB)** | [Layer 2](02-smoke-test.md) / [Layer 3](03-kubernetes-helm.md) | **Hourly + LCU** |
+| **EBS volume (MongoDB PVC)** | [Layer 3](03-kubernetes-helm.md) | **Per GB-month, provisioned size** |
 
 ## What's expensive
 
@@ -26,6 +28,8 @@ documentation deliverable.)
 3. **EC2 nodes** — 2 × `t3.medium`, hourly.
 4. **LoadBalancer** — hourly charge per ELB. An **orphaned** ELB (from a skipped
    smoke-test cleanup) keeps billing silently.
+5. **EBS volume (MongoDB)** — billed per GB-month for the **provisioned** size,
+   not what's used. An orphaned PVC volume left after teardown keeps billing.
 
 ## How to reduce cost
 
@@ -35,6 +39,8 @@ documentation deliverable.)
   the control plane and NAT bill by the hour even while idle.
 - **Delete LoadBalancer Services** you no longer need (and always before destroy)
   to avoid orphaned ELBs.
+- Keep the **MongoDB volume small** (e.g. 1–2 Gi for the lab) and **delete the
+  PVC** at teardown so its EBS volume is released (see [teardown](08-teardown.md)).
 - Enable **AWS Budgets alerts** so you're notified before a surprise bill.
 
 ## Guardrails (enforced for this lab)

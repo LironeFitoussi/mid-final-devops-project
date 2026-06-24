@@ -22,10 +22,14 @@ Push to code  →  Build (from Dockerfile)  →  Push to ECR (tag = git SHA)
 
 ## Tasks
 1. Configure AWS credentials from **GitHub Secrets** (never committed).
-2. Build the image from the `Dockerfile`.
+2. Build the **app image** from the `Dockerfile`.
 3. Push to ECR with `tag = git SHA` (the [Layer 4](04-registry-ecr.md) scheme).
 4. `aws eks update-kubeconfig`, then `helm upgrade` injecting the **new** tag
    (e.g. `--set image.tag=$GITHUB_SHA`) — not a fixed value.
+
+> The CI builds and pushes **only the app image**. The same `helm upgrade` manages
+> **both** workloads (app + MongoDB), but only the app's image tag changes between
+> runs — MongoDB keeps running and its data persists on the PVC across rollouts.
 
 ## Acceptance Criteria
 - [ ] Credentials managed via GitHub Secrets (not in the repo)

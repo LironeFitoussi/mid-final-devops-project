@@ -15,6 +15,9 @@ Push the application image to ECR (the repository was created in
 3. Tag it with an **immutable** tag — git SHA or semver.
 4. Push to the ECR repository.
 
+> **Only the app image goes to ECR.** MongoDB uses the official public `mongo:7`
+> image, pulled directly by its Deployment — it is never built or pushed here.
+
 ## Acceptance Criteria
 - [ ] Authentication to ECR works
 - [ ] **Immutable tagging** — git SHA or semver. **Do not use `latest`**

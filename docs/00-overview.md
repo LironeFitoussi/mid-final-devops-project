@@ -32,24 +32,32 @@ application or author the `Dockerfile`. Provided:
 
 | Item | Detail |
 |------|--------|
-| Source code | A simple web application |
-| `Dockerfile` | Ready and valid — used by the CI to build |
-| Ready-made image | On Docker Hub, e.g. `course/sample-app:1.0.0` |
-| App spec | **Port:** `8080` · **Health endpoint:** `GET /healthz` (returns `200`) |
+| Source code | **MemeForge** — a MERN-stack CMS app (MongoDB · Express · React · Node, TypeScript). See [`app/`](../app/README.md) |
+| `Dockerfile` | Ready and valid — multi-stage; used by the CI to build the app image |
+| Ready-made image | On Docker Hub, e.g. `course/sample-app:1.0.0` (Layer 2 smoke test only) |
+| App spec | **Port:** `8080` · **Health:** `GET /healthz` → 200 · **Readiness:** `GET /readyz` (DB-aware) |
+| Datastore | **MongoDB** — deployed **in-cluster** by the Helm chart as a second workload |
 
 ### Image lifecycle (read this — it removes most confusion)
 
-There are **two** images in this lab, with distinct roles:
+There are **three** images in this lab, with distinct roles:
 
-1. **Docker Hub image** (`course/sample-app:1.0.0`) — used **only** for the
-   Layer 2 smoke test, to prove the cluster and exposure work without depending
-   on the pipeline.
-2. **ECR image** — the CI (Layer 5) builds it **from the provided `Dockerfile`**
+1. **Smoke-test image** (`course/sample-app:1.0.0`, Docker Hub) — used **only**
+   for the Layer 2 smoke test, to prove the cluster and exposure work without
+   depending on the pipeline.
+2. **App image** — the CI (Layer 5) builds it **from the provided `Dockerfile`**
    and pushes it to ECR with an immutable tag. **This is what is actually
-   deployed** in Layers 4–6.
+   deployed** in Layers 4–6 (the MemeForge app Deployment).
+3. **MongoDB image** (`mongo:7`, Docker Hub) — pulled directly by the in-cluster
+   MongoDB Deployment. Not built, not in ECR; the same image across releases.
 
-> Pulling from ECR needs no pull secret — the node IAM role handles it. That's
-> why the real deployment pulls from ECR, not Docker Hub.
+> Pulling from ECR needs no pull secret — the node IAM role handles it. The public
+> `mongo:7` image needs no secret either. That's why the real app deployment pulls
+> from ECR, not Docker Hub.
+
+> The Helm chart ([Layer 3](03-kubernetes-helm.md)) deploys **two workloads** —
+> the app (image #2) and MongoDB (image #3) — and wires the app to the DB via
+> `MONGODB_URI`.
 
 ---
 

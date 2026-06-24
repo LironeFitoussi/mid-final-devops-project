@@ -37,12 +37,45 @@ the recommended defaults and their rationale.)
   first-class API resources. The CI identity differs from the cluster creator and
   must be mapped explicitly ([Prereq #3](00-prerequisites.md)).
 
-## Packaging: a single custom Helm chart
+## Packaging: a single custom Helm chart, two Deployments
 
-- **Decision:** one custom chart is the **only** deployment source; no raw
-  manifests after the smoke test.
-- **Why:** one source of truth, parameterised via `values.yaml` (image, replicas,
-  service) so the CI can drive upgrades cleanly.
+- **Decision:** one custom chart is the **only** deployment source (no raw
+  manifests after the smoke test), and it deploys **two workloads** — the
+  MemeForge app and MongoDB.
+- **Why:** one source of truth and one `helm upgrade` for the whole release,
+  parameterised via `values.yaml` (app image, replicas, service, plus a
+  `mongodb` block) so the CI can drive upgrades cleanly.
+
+## Datastore: in-cluster MongoDB (vs Atlas)
+
+- **Decision:** run MongoDB **in the cluster** via the same Helm chart, backed by
+  a PVC, rather than using managed MongoDB Atlas.
+- **Why:** keeps the whole stack self-contained and reproducible with one
+  `helm install`/`helm uninstall`, and makes teardown a single, demonstrable
+  flow. Atlas is the better production choice (offloads HA/backups) and is a valid
+  alternative — see [app/README.md → Deployment note](../app/README.md#deployment-note--mongodb-dependency).
+
+## MongoDB topology: single-replica Deployment
+
+- **Decision:** MongoDB is a **single-replica Deployment** with one PVC.
+- **Why:** simplest thing that works for the lab. A multi-node MongoDB requires a
+  **StatefulSet** (stable network IDs + per-replica volumes); scaling a
+  Deployment-based Mongo past 1 corrupts data. StatefulSet/replica-set MongoDB is
+  a [bonus](00-overview.md#bonus-optional--not-required-for-the-base-timeline).
+
+## App ↔ DB wiring: `MONGODB_URI` via Secret
+
+- **Decision:** the app reads `MONGODB_URI` from a Kubernetes **Secret**, pointing
+  at the MongoDB `ClusterIP` Service (`mongodb://<release>-mongodb:27017/memeforge`).
+- **Why:** keeps connection details (and any credentials) out of the image and out
+  of `values.yaml` plaintext; the DB is internal-only (never a LoadBalancer).
+
+## Persistent storage: EBS CSI driver + gp3
+
+- **Decision:** install the `aws-ebs-csi-driver` EKS addon (IRSA) with a default
+  `gp3` StorageClass; MongoDB's PVC provisions an EBS volume dynamically.
+- **Why:** EKS does not ship dynamic EBS provisioning by default — without the
+  driver the PVC stays `Pending`. `gp3` is cheaper/faster than `gp2`.
 
 ## Image tagging: immutable (git SHA)
 

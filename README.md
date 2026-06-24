@@ -25,8 +25,10 @@ React · Node, TypeScript) CMS-style web app — see [`app/README.md`](app/READM
 The remaining directories (`terraform/`, `helm/`, `.github/workflows/`) are
 **not** created yet; you build them as you complete each layer.
 
-> **Note:** the app requires a MongoDB it can reach from the cluster (Atlas or an
-> in-cluster MongoDB). The Helm chart in Layer 3 must wire `MONGODB_URI` — see
+> **Note:** the app needs MongoDB. In this lab the Helm chart ([Layer 3](docs/03-kubernetes-helm.md))
+> deploys **two workloads** — the MemeForge app **and** an in-cluster MongoDB
+> (backed by a PVC) — and wires the app to it via `MONGODB_URI`. This requires the
+> EBS CSI driver from [Layer 1](docs/01-infrastructure.md). See
 > [app/README.md → Deployment note](app/README.md#deployment-note--mongodb-dependency).
 
 ## Documentation index
