@@ -20,10 +20,14 @@ application** (`app/`). Each layer of the project has its own document with a
 goal, ordered tasks, an acceptance checklist, common pitfalls, and verification
 commands. Work through them in order — the numbering matches the build order.
 
-The provided app (`app/`) is **MemeForge**, a self-contained CMS-style web app —
-see [`app/README.md`](app/README.md). The remaining directories (`terraform/`,
-`helm/`, `.github/workflows/`) are **not** created yet; you build them as you
-complete each layer.
+The provided app (`app/`) is **MemeForge**, a **MERN-stack** (MongoDB · Express ·
+React · Node, TypeScript) CMS-style web app — see [`app/README.md`](app/README.md).
+The remaining directories (`terraform/`, `helm/`, `.github/workflows/`) are
+**not** created yet; you build them as you complete each layer.
+
+> **Note:** the app requires a MongoDB it can reach from the cluster (Atlas or an
+> in-cluster MongoDB). The Helm chart in Layer 3 must wire `MONGODB_URI` — see
+> [app/README.md → Deployment note](app/README.md#deployment-note--mongodb-dependency).
 
 ## Documentation index
 

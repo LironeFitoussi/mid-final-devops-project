@@ -1,0 +1,25 @@
+# Local development: the MERN app + a MongoDB instance.
+# Build & run:  docker compose up --build
+# Then open http://localhost:8080
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/memeforge
+      APP_VERSION: 1.0.0
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:

@@ -4,6 +4,10 @@ npm-debug.log*
 .npm
 .env
 
+# Build output
+dist/
+build/
+
 # Terraform (created in Layer 1)
 **/.terraform/*
 *.tfstate

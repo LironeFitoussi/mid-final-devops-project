@@ -1,9 +1,9 @@
-node_modules
-npm-debug.log
+**/node_modules
+**/dist
+**/npm-debug.log
 .git
 .gitignore
-Dockerfile
-.dockerignore
-*.md
-.env
-.DS_Store
+**/*.md
+**/.env
+**/.DS_Store
+docker-compose.yml
